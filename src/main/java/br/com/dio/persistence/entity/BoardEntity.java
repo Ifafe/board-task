@@ -16,6 +16,8 @@ public class BoardEntity {
 
     private Long id;
     private String name;
+    private java.time.LocalDateTime createdAt;
+    private java.time.LocalDateTime updatedAt;
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<BoardColumnEntity> boardColumns = new ArrayList<>();

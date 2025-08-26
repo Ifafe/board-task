@@ -3,6 +3,7 @@ package br.com.dio.service;
 import br.com.dio.persistence.dao.BoardColumnDAO;
 import br.com.dio.persistence.dao.BoardDAO;
 import br.com.dio.persistence.entity.BoardEntity;
+import br.com.dio.validation.ValidationUtils;
 import lombok.AllArgsConstructor;
 
 import java.sql.Connection;
@@ -14,6 +15,8 @@ public class BoardService {
     private final Connection connection;
 
     public BoardEntity insert(final BoardEntity entity) throws SQLException {
+        ValidationUtils.validateBoard(entity);
+        
         var dao = new BoardDAO(connection);
         var boardColumnDAO = new BoardColumnDAO(connection);
         try{
@@ -34,6 +37,8 @@ public class BoardService {
     }
 
     public boolean delete(final Long id) throws SQLException {
+        ValidationUtils.validateId(id);
+        
         var dao = new BoardDAO(connection);
         try{
             if (!dao.exists(id)) {

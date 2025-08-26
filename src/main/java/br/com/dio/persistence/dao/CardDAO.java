@@ -18,11 +18,17 @@ public class CardDAO {
     private Connection connection;
 
     public CardEntity insert(final CardEntity entity) throws SQLException {
-        var sql = "INSERT INTO CARDS (title, description, board_column_id) values (?, ?, ?);";
+        var sql = "INSERT INTO CARDS (title, description, priority, due_date, board_column_id) values (?, ?, ?, ?, ?);";
         try(var statement = connection.prepareStatement(sql)){
             var i = 1;
             statement.setString(i ++, entity.getTitle());
             statement.setString(i ++, entity.getDescription());
+            statement.setString(i ++, entity.getPriority().name());
+            if (entity.getDueDate() != null) {
+                statement.setTimestamp(i ++, java.sql.Timestamp.valueOf(entity.getDueDate()));
+            } else {
+                statement.setNull(i ++, java.sql.Types.TIMESTAMP);
+            }
             statement.setLong(i, entity.getBoardColumn().getId());
             statement.executeUpdate();
             if (statement instanceof StatementImpl impl){
@@ -48,6 +54,8 @@ public class CardDAO {
                 SELECT c.id,
                        c.title,
                        c.description,
+                       c.priority,
+                       c.due_date,
                        b.blocked_at,
                        b.block_reason,
                        c.board_column_id,
@@ -77,7 +85,9 @@ public class CardDAO {
                         resultSet.getString("b.block_reason"),
                         resultSet.getInt("blocks_amount"),
                         resultSet.getLong("c.board_column_id"),
-                        resultSet.getString("bc.name")
+                        resultSet.getString("bc.name"),
+                        resultSet.getString("c.priority"),
+                        toOffsetDateTime(resultSet.getTimestamp("c.due_date"))
                 );
                 return Optional.of(dto);
             }
